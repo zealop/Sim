@@ -55,3 +55,8 @@ public class Format
     public Action<Battle> OnBegin { get; set; }
     public bool NoLog { get; set; }
 }
+
+public class ActiveMove
+{
+    
+}

@@ -1,8 +1,11 @@
 ﻿namespace Sim;
 
-public class Dex
+public class DexSingleton
 {
-    public static ModdedDex I = new ModdedDex();
+    public static ModdedDex I = new()
+    {
+        Formats = new DexFormats()
+    };
 }
 
 public class ModdedDex
@@ -12,6 +15,6 @@ public class ModdedDex
 
     public ModdedDex ForFormat(Format format)
     {
-        return null;
+        return this;
     }
 }

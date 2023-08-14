@@ -25,7 +25,7 @@ public class BattleStream
         {
             if (!line.StartsWith(">")) continue;
 
-            var temp = line.Substring(1).Split(' ');
+            var temp = line.Substring(1).Split(' ', 2);
             string type = temp[0], message = temp[1];
             writeLine(type, message);
         }
@@ -45,6 +45,11 @@ public class BattleStream
                 };
                 options.Debug = this.debug;
                 this.battle = new Battle(options);
+                break;
+            case "player":
+                var splits = message.Split(' ', 2);
+                string slot = splits[0], optionsText = splits[1];
+                this.battle.SetPlayer(slot, JsonConvert.DeserializeObject<PlayerOptions>(optionsText));
                 break;
         }
     }
