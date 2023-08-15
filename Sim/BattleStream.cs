@@ -1,12 +1,13 @@
-﻿using Newtonsoft.Json;
+﻿using Lombok.NET;
+using Newtonsoft.Json;
 using Sim.Lib;
 
 namespace Sim;
 
-public class BattleStream
+public partial class BattleStream
 {
     private bool debug;
-    private Battle battle;
+    [Property] private Battle battle;
 
     public static StreamData GetPlayerStreams(BattleStream stream)
     {
@@ -44,19 +45,34 @@ public class BattleStream
                     //TODO: if (t === 'end' && !this.keepAlive) this.pushEnd();
                 };
                 options.Debug = this.debug;
-                this.battle = new Battle(options);
+                this.Battle = new Battle(options);
                 break;
             case "player":
                 var splits = message.Split(' ', 2);
                 string slot = splits[0], optionsText = splits[1];
-                this.battle.SetPlayer(slot, JsonConvert.DeserializeObject<PlayerOptions>(optionsText));
+                this.Battle.SetPlayer(slot, JsonConvert.DeserializeObject<PlayerOptions>(optionsText));
                 break;
         }
     }
 
     private void pushMessage(string s, string dataString)
     {
-        throw new NotImplementedException();
+    }
+
+    public void Start(BattleOptions options)
+    {
+        options.Send = (t, data) =>
+        {
+            var dataString = string.Join("\n", data);
+            pushMessage(t, dataString);
+            //TODO: if (t === 'end' && !this.keepAlive) this.pushEnd();
+        };
+        options.Debug = this.debug;
+        this.Battle = new Battle(options);
+    }
+
+    public void Player(string slot, PlayerOptions options)
+    {
     }
 }
 

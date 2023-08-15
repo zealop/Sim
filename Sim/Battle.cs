@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using Lombok.NET;
+using OneOf;
 
 namespace Sim;
 
@@ -53,7 +54,7 @@ public class Battle
     {
         this.log = new List<string>();
         this.add("t:", DateTime.Now.Millisecond);
-        this.format = options.Format ?? DexSingleton.I.Formats.Get(options.Formatid, true);
+        this.format = options.Format ?? DexSingleton.I.Formats.Get(options.FormatId, true);
         this.Dex = DexSingleton.I.ForFormat(this.format);
         this.gen = this.Dex.gen;
         this.ruleTable = this.Dex.Formats.GetRuleTable(this.format);
@@ -61,7 +62,7 @@ public class Battle
         this.field = new Field(this);
         this.sides = new Side[2];
         this.activePerHalf = 1;
-        this.prng = options.prng ?? (options.seed == null ? new Random() : new Random(options.seed.Value));
+        this.prng = options.Prng ?? (options.Seed == null ? new Random() : new Random(options.Seed.Value));
         this.queue = new BattleQueue(this);
         this.actions = new BattleActions(this);
         this.faintQueue = new Queue<FaintQueueData>();
@@ -137,13 +138,24 @@ internal class FaintQueueData
     public Effect Effect { get; set; }
 }
 
-public class BattleOptions
+[With]
+public partial class BattleOptions
 {
-    public Format Format { get; set; }
-    public string Formatid { get; set; }
-    public Random prng { get; set; }
-    public int? seed { get; set; }
-    public bool Debug { get; set; }
+    [Property] private Format _format;
+    [Property] private string _formatId;
 
-    public Action<string, string[]> Send;
+    /** Output callback */
+    [Property] private Action<string, string[]> _send;
+
+    [Property] private Random _prng; // PRNG override (you usually don't need this, just pass a seed)
+    [Property] private int? _seed; // PRNG seed
+    [Property] private OneOf<bool, string>? _rated; // Rated string
+    [Property] private PlayerOptions _p1; // Player 1 data
+    [Property] private PlayerOptions _p2; // Player 2 data
+    [Property] private PlayerOptions _p3; // Player 3 data
+    [Property] private PlayerOptions _p4; // Player 4 data
+    [Property] private bool _debug; // show debug mode option
+    [Property] private bool _forceRandomChance; // force Battle#randomChance to always return true or false (used in some tests)
+    [Property] private bool _deserialized;
+    [Property] private bool _strictChoices; // whether invalid choices should throw
 }
