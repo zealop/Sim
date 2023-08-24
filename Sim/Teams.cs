@@ -1,4 +1,6 @@
-﻿namespace Sim;
+﻿using Lombok.NET;
+
+namespace Sim;
 
 public class Teams
 {
@@ -10,7 +12,7 @@ public class Teams
 
     public static PokemonSet[] Generate(string format)
     {
-        throw new System.NotImplementedException();
+        throw new NotImplementedException();
     }
 
     public static List<PokemonSet> Unpack(string buf)
@@ -124,19 +126,20 @@ public class Teams
     }
 }
 
-public class PokemonSet
+[With]
+public partial class PokemonSet
 {
-    public string name;
-    public string species;
-    public string item;
-    public string ability;
-    public string[] moves;
-    public string nature;
-    public string gender;
-    public StatTable evs;
-    public StatTable ivs;
-    public bool shiny;
-    public int level;
+    [Property] private string _name;
+    [Property] private string _species;
+    [Property] private string _item;
+    [Property] private string _ability;
+    [Property] private string[] _moves;
+    [Property] private string _nature;
+    [Property] private string _gender;
+    [Property] private StatTable _evs;
+    [Property] private StatTable _ivs;
+    [Property] private bool _shiny;
+    [Property] private int _level;
 }
 
 public class StatTable

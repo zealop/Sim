@@ -24,10 +24,11 @@ public class AnyObject : Dictionary<string, object>
 {
 }
 
+[With]
 public partial class PlayerOptions
 {
     [Property] private string _name;
     [Property] private string _avatar;
     [Property] private int _rating;
-    [Property] private string _team;
+    [Property] private PokemonSet[] _team;
 }

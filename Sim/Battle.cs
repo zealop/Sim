@@ -113,21 +113,14 @@ public class Battle
         this.log.Add($"|{string.Join('|', parts.ToString())}");
     }
 
-    public void SetPlayer(string slot, PlayerOptions optionsText)
+    public void SetPlayer(int slot, PlayerOptions options)
     {
         Side side;
         var didSomething = true;
-        var slotNum = int.Parse(slot[1].ToString()) - 1;
-        if (this.sides[slotNum] == null)
+        if (this.sides[slot] == null)
         {
-            var team = this.GetTeam(optionsText);
+            side = new Side(slot, options, this);
         }
-    }
-
-    private List<PokemonSet> GetTeam(PlayerOptions options)
-    {
-        var team = Teams.Unpack(options.Team);
-        return team;
     }
 }
 

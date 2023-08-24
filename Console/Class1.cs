@@ -8,5 +8,12 @@ var stream = new BattleStream();
 var battleOptions = new BattleOptions().WithFormatId("gen1customgame");
 stream.Start(battleOptions);
 
+var team = new[]
+{
+        new PokemonSet()
+                .WithSpecies("Nidorino")
+                .WithMoves(new[]{"doublekick", "bodyslam", "blizzard", "thunderbolt"})
+};
+var playerOptions = new PlayerOptions().WithTeam(team);
 
-stream.Player("p1", );
+stream.Player(1, playerOptions);
