@@ -11,9 +11,11 @@ stream.Start(battleOptions);
 var team = new[]
 {
         new PokemonSet()
-                .WithSpecies("Nidorino")
+                .WithSpecies(new Species() {Name})
                 .WithMoves(new[]{"doublekick", "bodyslam", "blizzard", "thunderbolt"})
 };
 var playerOptions = new PlayerOptions().WithTeam(team);
 
 stream.Player(1, playerOptions);
+
+Console.WriteLine("");

@@ -3,7 +3,7 @@ using OneOf;
 
 namespace Sim;
 
-public class Battle
+public partial class Battle
 {
     private List<string> log;
     private Format format;
@@ -28,6 +28,7 @@ public class Battle
     private readonly bool ended;
     private Effect effect;
     private EffectState effectState;
+    [Property] private GameType _gameType;
     private AnyObject _event;
     private AnyObject events;
     private readonly int eventDepth;
