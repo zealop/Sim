@@ -34,7 +34,7 @@ public partial class Choice
 {
     [Property] private bool _cantUndo;
     [Property] private string _error;
-    [Property] private ChosenAction[] _actions;
+    [Property] private List<ChosenAction> _actions;
     [Property] private int _forcedSwitchesLeft;
     [Property] private int _forcedPassesLeft;
     [Property] private HashSet<int> _switchIns;
@@ -55,17 +55,17 @@ public partial class Side
      */
     private readonly int _n;
 
-    private string _name;
-    private string _avatar;
-    private Side _foe;
-    private Side _allySide;
-    private PokemonSet[] _team;
-    private Pokemon[] _pokemon;
-    private Pokemon[] _active;
+    [Property] private string _name;
+    [Property] private string _avatar;
+    [Property] private Side _foe;
+    [Property] private Side _allySide;
+    [Property] private PokemonSet[] _team;
+    [Property] private Pokemon[] _pokemon;
+    [Property] private Pokemon[] _active;
 
-    private int _pokemonLeft;
-    private bool _zMoveUsed;
-    private bool _dynamaxUsed;
+    [Property] private int _pokemonLeft;
+    [Property] private bool _zMoveUsed;
+    [Property] private bool _dynamaxUsed;
 
     private Pokemon _faintedLastTurn;
     private Pokemon _faintedThisTurn;
@@ -107,7 +107,7 @@ public partial class Side
         {
             CantUndo = false,
             Error = "",
-            Actions = new ChosenAction[0],
+            Actions = new List<ChosenAction>(),
             ForcedSwitchesLeft = 0,
             ForcedPassesLeft = 0,
             SwitchIns = new HashSet<int>(),
@@ -128,6 +128,102 @@ public partial class Side
             GameType.Doubles => 2,
             GameType.Triples or GameType.Rotation => 3,
             _ => 1
+        };
+    }
+
+    public bool Choose(string choiceType, string data, int? targetLoc = null, string moveEvent = "")
+    {
+        this.ClearChoice();
+
+        switch (choiceType)
+        {
+            case "move":
+                this.ChooseMove(data, targetLoc, moveEvent);
+                break;
+            default:
+                throw new SystemException();
+        }
+
+        return false;
+    }
+
+    private void ChooseMove(string moveText, int? targetLoc, string moveEvent)
+    {
+        int index = this.GetChoiceIndex();
+
+        var autoChoose = string.IsNullOrEmpty(moveText);
+        var pokemon = this._active[index];
+
+        var request = pokemon.GetMoveRequestData();
+    }
+
+    private int GetChoiceIndex(bool isPass = false)
+    {
+        var index = this._choice.Actions.Count;
+
+        if (!isPass)
+        {
+            switch (this.RequestState)
+            {
+                case RequestState.Move:
+                    while (index < this._active.Length && (this._active[index].Fainted ||
+                                                           this._active[index].Volatiles.ContainsKey("commanding"))
+                          )
+                    {
+                        this.ChoosePass();
+                        index++;
+                    }
+
+                    break;
+                case RequestState.Switch:
+                    break;
+            }
+        }
+
+        return index;
+    }
+
+    private void ChoosePass()
+    {
+    }
+
+    private RequestState RequestState
+    {
+        get
+        {
+            if (this._activeRequest == null) return RequestState.Blank;
+            if (this._activeRequest.ContainsKey("wait")) return RequestState.Blank;
+            if (this._activeRequest.ContainsKey("teamPreview")) return RequestState.TeamPreview;
+            if (this._activeRequest.ContainsKey("forceSwitch")) return RequestState.Switch;
+            return RequestState.Move;
+        }
+    }
+
+    private void ClearChoice()
+    {
+        var forceSwitches = 0;
+        var forcedPasses = 0;
+        if (this._battle.RequestState == RequestState.Switch)
+        {
+            var canSwitchOut = this._active.Count(p => p?.SwitchFlag == true);
+            var canSwitchIn = this._pokemon.Take(this._active.Length).Count(p => p != null && !p.Fainted);
+
+            forceSwitches = Math.Max(canSwitchIn, canSwitchOut);
+            forcedPasses = canSwitchOut - forceSwitches;
+        }
+
+        this._choice = new Choice
+        {
+            CantUndo = false,
+            Error = "",
+            Actions = new List<ChosenAction>(),
+            ForcedSwitchesLeft = forceSwitches,
+            ForcedPassesLeft = forcedPasses,
+            SwitchIns = new HashSet<int>(),
+            ZMove = false,
+            Mega = false,
+            Ultra = false,
+            Terastallize = false
         };
     }
 }

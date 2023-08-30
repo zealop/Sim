@@ -114,3 +114,19 @@ public enum EffectType
     Rule,
     ValidatorRule
 }
+
+public enum Nonstandard
+{
+    Past,
+    Future,
+    Unobtainable,
+    CAP,
+    LGPE,
+    Custom,
+    Gigantamax
+}
+
+public enum TierTypes
+{
+    
+}

@@ -16,7 +16,6 @@ public class Teams
     }
 }
 
-[With]
 public partial class PokemonSet
 {
     [Property] private string _name;

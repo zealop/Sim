@@ -25,20 +25,20 @@ public partial class Attacker
     [Property] private int? _damageValue;
 }
 
-public class Pokemon
+public partial class Pokemon
 {
-    private readonly Side _side;
-    private readonly Battle _battle;
+    [Property] private readonly Side _side;
+    [Property] private readonly Battle _battle;
 
-    private readonly PokemonSet _set;
-    private readonly string _name;
-    private readonly string _fullName;
-    private readonly int _level;
-    private readonly GenderName _gender;
-    private readonly int _happiness;
-    private readonly string _pokeball;
-    private readonly int _dynamaxLevel;
-    private readonly bool _gigantamax;
+    [Property] private readonly PokemonSet _set;
+    [Property] private readonly string _name;
+    [Property] private readonly string _fullName;
+    [Property] private readonly int _level;
+    [Property] private readonly GenderName _gender;
+    [Property] private readonly int _happiness;
+    [Property] private readonly string _pokeball;
+    [Property] private readonly int _dynamaxLevel;
+    [Property] private readonly bool _gigantamax;
 
     private readonly string _baseHpType;
     private readonly int _baseHpPower;
@@ -56,10 +56,10 @@ public class Pokemon
     private Species _species;
     private EffectState _speciesState;
 
-    private string _status;
-    private EffectState _statusState;
-    private Dictionary<string, EffectState> _volatiles;
-    private bool _showCure;
+    [Property] private string _status;
+    [Property] private EffectState _statusState;
+    [Property] private Dictionary<string, EffectState> _volatiles;
+    [Property] private bool _showCure;
 
     private StatsTable _baseStoredStats;
     private StatsExceptHPTable _storedStats;
@@ -82,24 +82,24 @@ public class Pokemon
     private Pokemon _illusion;
     private bool _transformed;
 
-    private int _maxHp;
-    private int _baseMaxHp;
-    private int _hp;
-    private bool _fainted;
-    private bool _faintQueued;
-    private bool _subFainted;
+    [Property] private int _maxHp;
+    [Property] private int _baseMaxHp;
+    [Property] private int _hp;
+    [Property] private bool _fainted;
+    [Property] private bool _faintQueued;
+    [Property] private bool _subFainted;
 
     private string[] _types;
     private string _addedType;
     private bool _knownType;
     private string _apparentType;
 
-    private bool _switchFlag;
-    private bool _forceSwitchFlag;
-    private bool _skipBeforeSwitchOutEventFlag;
-    private int? _draggedIn;
-    private bool _newlySwitched;
-    private bool _beingCalledBack;
+    [Property] private bool _switchFlag;
+    [Property] private bool _forceSwitchFlag;
+    [Property] private bool _skipBeforeSwitchOutEventFlag;
+    [Property] private int? _draggedIn;
+    [Property] private bool _newlySwitched;
+    [Property] private bool _beingCalledBack;
 
     private ActiveMove _lastMove;
 
@@ -153,7 +153,7 @@ public class Pokemon
 
     private StatsExceptHPTable _modifiedStats;
     private Action<Pokemon, StatIDExceptHp, int> _modifyStat;
-    private Action<Pokemon> _recalculateStats;
+    [Property] private Action<Pokemon> _recalculateStats;
 
     public class M : Dictionary<string, object>
     {
@@ -324,4 +324,76 @@ public class Pokemon
     {
         //TODO
     }
+
+    public object GetMoveRequestData()
+    {
+        string lockedMove = null; //TODO
+
+        var isLastActive = this.IsLastActive();
+        var canSwitchIn = this._battle.CanSwitch(this._side) > 0;
+
+        var moves = this.GetMoves(lockedMove, isLastActive);
+        return null;
+    }
+
+    private MoveDto[] GetMoves(string lockedMove, bool restrictData)
+    {
+        if (lockedMove != null)
+        {
+            this._trapped = true;
+            if ("recharge".Equals(lockedMove))
+            {
+                return new MoveDto[] { new() { Move = "Recharge", Id = "recharge" } };
+            }
+
+            foreach (var moveSlot in this._moveSlots)
+            {
+                if (!moveSlot.Id.Equals(lockedMove)) continue;
+                return new MoveDto[] { new() { Move = moveSlot.Move, Id = moveSlot.Id } };
+            }
+
+            return new MoveDto[] { new() { Move = lockedMove, Id = lockedMove } };
+        }
+
+        List<MoveDto> moves = new List<MoveDto>();
+        var hasValidMove = false;
+
+        foreach (var moveSlot in this._moveSlots)
+        {
+            var moveName = moveSlot.Move;
+            var target = moveSlot.Target;
+            if ("curse".Equals(moveSlot.Id))
+            {
+                if (!this.HasType("Ghost"))
+                {
+                    target = this.Battle.Dex.Moves
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private bool IsLastActive()
+    {
+        if (!this._isActive) return false;
+        var allyActive = this._side.Active;
+        for (var i = this._position + 1; i < allyActive.Length; i++)
+        {
+            if (allyActive[i] != null && !allyActive[i].Fainted) return false;
+        }
+
+        return true;
+    }
+}
+
+public partial class MoveDto
+{
+    [Property] private string _move;
+    [Property] private string _id;
+    [Property] private bool _disabled;
+    [Property] private string _disabledSource;
+    [Property] private string _target;
+    [Property] private int _pp;
+    [Property] private int _maxPp;
 }

@@ -1,5 +1,4 @@
 ﻿using Lombok.NET;
-using Newtonsoft.Json;
 using Sim.Lib;
 
 namespace Sim;
@@ -7,16 +6,16 @@ namespace Sim;
 public partial class BattleStream
 {
     private bool debug;
-    [Property] private Battle battle;
-    
+    [Property] private Battle _battle;
+
     public void Start(BattleOptions options)
     {
-        this.Battle = new Battle(options);
+        this._battle = new Battle(options);
     }
 
     public void Player(int slot, PlayerOptions options)
     {
-        this.battle.SetPlayer(slot, options);
+        this._battle.SetPlayer(slot, options);
     }
 }
 
