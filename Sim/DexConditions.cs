@@ -14,3 +14,10 @@ public class ConditionData : OneOfBase<PokemonConditionData>
     {
     }
 }
+
+public class Condition : BasicEffect
+{
+    public override EffectType EffectType { get; }
+
+    private int _counterMax;
+}

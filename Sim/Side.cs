@@ -138,7 +138,7 @@ public partial class Side
         switch (choiceType)
         {
             case "move":
-                this.ChooseMove(data, targetLoc, moveEvent);
+                // this.ChooseMove(data, targetLoc, moveEvent);
                 break;
             default:
                 throw new SystemException();
@@ -147,11 +147,11 @@ public partial class Side
         return false;
     }
 
-    private void ChooseMove(string moveText, int? targetLoc, string moveEvent)
+    public void ChooseMove(int moveIndex, int targetLoc = 0, string moveEvent = null)
     {
         int index = this.GetChoiceIndex();
 
-        var autoChoose = string.IsNullOrEmpty(moveText);
+        var autoChoose = false;
         var pokemon = this._active[index];
 
         var request = pokemon.GetMoveRequestData();

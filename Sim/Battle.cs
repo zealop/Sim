@@ -1,4 +1,6 @@
-﻿using Lombok.NET;
+﻿using System.Diagnostics;
+using System.Diagnostics.Tracing;
+using Lombok.NET;
 using OneOf;
 
 namespace Sim;
@@ -9,6 +11,26 @@ public enum RequestState
     Move,
     Switch,
     Blank
+}
+
+public partial class EventListenerWithoutPriority
+{
+    [Property] private Effect _effect;
+    [Property] private Pokemon _target;
+    [Property] private int _index;
+    [Property] private Action _callback;
+    [Property] private EffectState _state;
+    [Property] private Delegate _end;
+    [Property] private object[] _endCallArgs;
+    [Property] private OneOf<Pokemon, Side, Field, Battle> _effectHolder;
+}
+
+public partial class EventListener : EventListenerWithoutPriority
+{
+    [Property] private int _order;
+    [Property] private int _priority;
+    [Property] private int _subOrder;
+    [Property] private int _speed;
 }
 
 public partial class Battle
@@ -148,9 +170,10 @@ public partial class Battle
     {
         Side side;
         var didSomething = true;
-        if (this.sides[slot] == null)
+        if (this._sides[slot] == null)
         {
             side = new Side(slot, options, this);
+            this._sides[slot] = side;
         }
     }
 
@@ -175,9 +198,68 @@ public partial class Battle
 
         return canSwitchIn;
     }
+
+    public object RunEvent(
+        string eventId, OneOf<Pokemon, Pokemon[], Side, Battle>? target = null,
+        OneOf<string, Pokemon, bool>? source = null,
+        Effect sourceEffect = null, object relayVar = null, bool onEffect = false, bool fastExit = false
+    )
+    {
+        target ??= this;
+
+        Pokemon effectSource = null;
+        if (source?.IsT1 == true) effectSource = source?.AsT1;
+        var handlers = this.FindEventHandlers(target, eventId, effectSource);
+
+        return null;
+    }
+
+    private List<EventListener> FindEventHandlers(OneOf<Pokemon, Pokemon[], Side, Battle>? target, string eventId,
+        Pokemon source)
+    {
+        var handlers = new List<EventListener>();
+
+        if (target?.IsT1 == true)
+        {
+            var targetArray = target.Value.AsT1;
+            for (var i = 0; i < targetArray.Length; i++)
+            {
+                var pokemon = targetArray[i];
+                var curHandlers = this.FindEventHandlers(pokemon, eventId, source);
+                foreach (var handler in curHandlers)
+                {
+                    handler.Target = pokemon;
+                    handler.Index = i;
+                }
+            }
+
+            return handlers;
+        }
+
+        var prefixedHandlers = !new[] { "BeforeTurn", "Update", "Weather", "WeatherChange", "TerrainChange" }
+            .Contains(eventId);
+
+        if (target?.IsT0 == true && (target.Value.AsT0.IsActive || source.IsActive))
+        {
+            handlers = this.FindPokemonEventHandlers(target.Value.AsT0, $"on{eventId}");
+        }
+
+        return handlers;
+    }
+
+    private List<EventListener> FindPokemonEventHandlers(
+        Pokemon pokemon, string callbackName, string getKey = null
+    )
+    {
+        var handlers = new List<EventListener>();
+
+        var status = pokemon.GetStatus();
+
+        return handlers;
+    }
 }
 
-internal class FaintQueueData
+public class FaintQueueData
 {
     public Pokemon Target { get; set; }
     public Pokemon Source { get; set; }

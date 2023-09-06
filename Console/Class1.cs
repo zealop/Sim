@@ -32,5 +32,7 @@ var player2Options = new PlayerOptions
 battle.SetPlayer(0, player1Options);
 battle.SetPlayer(1, player2Options);
 
+battle.Sides[0].ChooseMove(0);
+
 stopwatch.Stop();
 Console.WriteLine(stopwatch.ElapsedMilliseconds);

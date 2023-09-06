@@ -117,11 +117,11 @@ public partial class Pokemon
     private List<Attacker> _attackedBy;
     private int _timesAttacked;
 
-    private bool _isActive;
-    private int _activeTurns;
-    private int _activeMoveActions;
-    private int _previouslySwitchedIn;
-    private bool _truantTurn;
+    [Property] private bool _isActive;
+    [Property] private int _activeTurns;
+    [Property] private int _activeMoveActions;
+    [Property] private int _previouslySwitchedIn;
+    [Property] private bool _truantTurn;
 
     private bool _swordBoost;
     private bool _shieldBoost;
@@ -366,11 +366,28 @@ public partial class Pokemon
             {
                 if (!this.HasType("Ghost"))
                 {
-                    target = this.Battle.Dex.Moves
+                    // target = this.Battle.Dex.Moves
                 }
             }
         }
 
+        return null;
+    }
+
+    private bool HasType(params string[] ghost)
+    {
+        // const thisTypes  = this.GetTypes();
+        return false;
+    }
+
+    private string[] GetTypes(bool excludeAdded = false, bool preTerastallized = false)
+    {
+        if (!preTerastallized && this._terastallized != null)
+        {
+            return new[] { this._terastallized };
+        }
+
+        var types = this._battle.RunEvent("Type", this, null, null, this._types);
         return null;
     }
 
@@ -384,6 +401,11 @@ public partial class Pokemon
         }
 
         return true;
+    }
+
+    public Condition GetStatus()
+    {
+        return null;
     }
 }
 
