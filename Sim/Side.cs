@@ -1,4 +1,5 @@
 using Lombok.NET;
+using Sim.Pokemons;
 
 namespace Sim;
 
@@ -16,11 +17,11 @@ public partial class ChosenAction
     }
 
     [Property] private Type _choice;
-    [Property] private Pokemon _pokemon;
+    [Property] private Pokemons.Pokemon _pokemon;
     [Property] private int _targetLoc;
     [Property] private string _moveId;
     [Property] private ActiveMove _move;
-    [Property] private Pokemon _target;
+    [Property] private Pokemons.Pokemon _target;
     [Property] private int _index;
     [Property] private Side _side;
     [Property] private bool _mega;
@@ -60,15 +61,15 @@ public partial class Side
     [Property] private Side _foe;
     [Property] private Side _allySide;
     [Property] private PokemonSet[] _team;
-    [Property] private Pokemon[] _pokemon;
-    [Property] private Pokemon[] _active;
+    [Property] private Pokemons.Pokemon[] _pokemon;
+    [Property] private Pokemons.Pokemon[] _active;
 
     [Property] private int _pokemonLeft;
     [Property] private bool _zMoveUsed;
     [Property] private bool _dynamaxUsed;
 
-    private Pokemon _faintedLastTurn;
-    private Pokemon _faintedThisTurn;
+    private Pokemons.Pokemon _faintedLastTurn;
+    private Pokemons.Pokemon _faintedThisTurn;
     private int _totalFainted;
     private string _lastSelectedMove;
 
@@ -86,9 +87,9 @@ public partial class Side
         this._id = slot;
         this._name = options.Name;
         this._team = options.Team;
-        this._pokemon = this._team.Select((ps, i) => new Pokemon(ps, i, this)).ToArray();
+        this._pokemon = this._team.Select((ps, i) => new Pokemons.Pokemon(ps, this)).ToArray();
         var slots = countSlots(this._battle.GameType);
-        this._active = new Pokemon[slots];
+        this._active = new Pokemons.Pokemon[slots];
         this._pokemonLeft = this._pokemon.Length;
         this._faintedLastTurn = null;
         this._faintedThisTurn = null;

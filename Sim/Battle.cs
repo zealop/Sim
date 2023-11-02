@@ -2,6 +2,7 @@
 using System.Diagnostics.Tracing;
 using Lombok.NET;
 using OneOf;
+using Sim.Pokemons;
 
 namespace Sim;
 
@@ -16,13 +17,13 @@ public enum RequestState
 public partial class EventListenerWithoutPriority
 {
     [Property] private Effect _effect;
-    [Property] private Pokemon _target;
+    [Property] private Pokemons.Pokemon _target;
     [Property] private int _index;
     [Property] private Action _callback;
     [Property] private EffectState _state;
     [Property] private Delegate _end;
     [Property] private object[] _endCallArgs;
-    [Property] private OneOf<Pokemon, Side, Field, Battle> _effectHolder;
+    [Property] private OneOf<Pokemons.Pokemon, Side, Field, Battle> _effectHolder;
 }
 
 public partial class EventListener : EventListenerWithoutPriority
@@ -81,8 +82,8 @@ public partial class Battle
     [Property] private int _eventDepth;
 
     [Property] private ActiveMove _activeMove;
-    [Property] private Pokemon _activePokemon;
-    [Property] private Pokemon _activeTarget;
+    [Property] private Pokemons.Pokemon _activePokemon;
+    [Property] private Pokemons.Pokemon _activeTarget;
 
     [Property] private ActiveMove _lastMove;
     [Property] private string _lastSuccessfulMoveThisTurn;
@@ -182,11 +183,11 @@ public partial class Battle
         return this.PossibleSwitches(side).Count;
     }
 
-    private List<Pokemon> PossibleSwitches(Side side)
+    private List<Pokemons.Pokemon> PossibleSwitches(Side side)
     {
-        if (side.PokemonLeft == 0) return new List<Pokemon>();
+        if (side.PokemonLeft == 0) return new List<Pokemons.Pokemon>();
 
-        List<Pokemon> canSwitchIn = new List<Pokemon>();
+        List<Pokemons.Pokemon> canSwitchIn = new List<Pokemons.Pokemon>();
         for (var i = side.Active.Length; i < side.Pokemon.Length; i++)
         {
             var pokemon = side.Pokemon[i];
@@ -200,22 +201,22 @@ public partial class Battle
     }
 
     public object RunEvent(
-        string eventId, OneOf<Pokemon, Pokemon[], Side, Battle>? target = null,
-        OneOf<string, Pokemon, bool>? source = null,
+        string eventId, OneOf<Pokemons.Pokemon, Pokemons.Pokemon[], Side, Battle>? target = null,
+        OneOf<string, Pokemons.Pokemon, bool>? source = null,
         Effect sourceEffect = null, object relayVar = null, bool onEffect = false, bool fastExit = false
     )
     {
         target ??= this;
 
-        Pokemon effectSource = null;
+        Pokemons.Pokemon effectSource = null;
         if (source?.IsT1 == true) effectSource = source?.AsT1;
         var handlers = this.FindEventHandlers(target, eventId, effectSource);
 
         return null;
     }
 
-    private List<EventListener> FindEventHandlers(OneOf<Pokemon, Pokemon[], Side, Battle>? target, string eventId,
-        Pokemon source)
+    private List<EventListener> FindEventHandlers(OneOf<Pokemons.Pokemon, Pokemons.Pokemon[], Side, Battle>? target, string eventId,
+        Pokemons.Pokemon source)
     {
         var handlers = new List<EventListener>();
 
@@ -248,7 +249,7 @@ public partial class Battle
     }
 
     private List<EventListener> FindPokemonEventHandlers(
-        Pokemon pokemon, string callbackName, string getKey = null
+        Pokemons.Pokemon pokemon, string callbackName, string getKey = null
     )
     {
         var handlers = new List<EventListener>();
@@ -261,8 +262,8 @@ public partial class Battle
 
 public class FaintQueueData
 {
-    public Pokemon Target { get; set; }
-    public Pokemon Source { get; set; }
+    public Pokemons.Pokemon Target { get; set; }
+    public Pokemons.Pokemon Source { get; set; }
     public Effect Effect { get; set; }
 }
 
